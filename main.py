@@ -106,3 +106,6 @@ class LockScreenApp(App):
 
 if __name__ == '__main__':
     LockScreenApp().run()
+
+
+#飞机即将覅附加费解放军解放
