@@ -1,0 +1,58 @@
+
+====================================================
+          定时锁屏 App - APK 快速构建指南
+====================================================
+
+方法一：使用 Android Studio（推荐，最简单）
+====================================================
+
+1. 安装 Android Studio
+   - 访问 https://developer.android.com/studio
+   - 下载并安装 Windows 版本
+   - 或使用命令：winget install Google.AndroidStudio
+
+2. 打开项目
+   - 启动 Android Studio
+   - 选择 "Open an Existing Project"
+   - 选择此文件夹：F:\project\PythonProject\ScreenLock
+
+3. 等待同步
+   - Android Studio 会自动下载 Gradle 和依赖
+   - 等待底部进度条完成（可能需要 5-10 分钟）
+
+4. 构建 APK
+   - 点击菜单：Build > Build Bundle(s) / APK(s) > Build APK(s)
+   - 等待构建完成
+   - APK 位置：app\build\outputs\apk\debug\app-debug.apk
+
+
+方法二：命令行构建（需要先配置好 Android SDK）
+====================================================
+
+如果已经安装了 Android SDK 和配置好环境变量：
+
+1. 打开命令行，进入项目目录
+   cd F:\project\PythonProject\ScreenLock
+
+2. 运行构建命令
+   .\gradlew.bat assembleDebug
+
+3. APK 生成在：
+   app\build\outputs\apk\debug\app-debug.apk
+
+
+安装和使用说明
+====================================================
+
+1. 将 app-debug.apk 传输到 vivo 手机
+2. 在手机上安装 APK
+3. 首次打开时，点击"授予权限"
+4. 在系统设置中启用设备管理器权限
+5. 设置时间，点击开始计时
+
+
+注意事项
+====================================================
+- 必须授予设备管理器权限才能锁屏
+- vivo 手机建议在"自启动管理"中允许此应用
+- 如需卸载，先在系统设置中取消设备管理器权限
