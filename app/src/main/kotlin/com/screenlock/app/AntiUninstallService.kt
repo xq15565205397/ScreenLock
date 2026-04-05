@@ -15,13 +15,9 @@ import androidx.core.app.NotificationCompat
  */
 class AntiUninstallService : AccessibilityService() {
 
-    // ... 保持 import 不变
-
-class AntiUninstallService : AccessibilityService() {
-
     override fun onCreate() {
         super.onCreate()
-        // 修正：启动前台服务，使用更通用的系统图标 android.R.drawable.ic_secure
+        // 启动前台服务以提高 vivo 系统的存活率
         startForeground(1, createNotification())
     }
 
@@ -35,32 +31,29 @@ class AntiUninstallService : AccessibilityService() {
         return NotificationCompat.Builder(this, channelId)
             .setContentTitle("系统守护运行中")
             .setContentText("正在保护定时锁定状态...")
-            // 修正：换用绝对存在的图标
-            .setSmallIcon(android.R.drawable.ic_secure)
+            .setSmallIcon(android.R.drawable.ic_secure) // 修正：使用更稳定的系统图标
             .setOngoing(true)
             .build()
     }
-    
-    // ... 其余逻辑保持不变
-}
 
-    override fun onAccessibilityEvent(event: AccessibilityEvent) {
-        // 读取定时器状态
+    // 修正：添加了 AccessibilityEvent? 的问号，确保匹配基类签名
+    override fun onAccessibilityEvent(event: AccessibilityEvent?) {
+        // 1. 读取定时器状态
         val prefs = getSharedPreferences("LockConfig", Context.MODE_PRIVATE)
         val isTimerActive = prefs.getBoolean("is_timer_active", false)
         
-        // 只有在定时器激活时才进行拦截
-        if (!isTimerActive) return
+        // 只有在定时器激活且事件不为空时才进行拦截
+        if (!isTimerActive || event == null) return
 
         val packageName = event.packageName?.toString() ?: ""
 
-        // 1. 拦截多任务键 (防止划掉卡片)
+        // 2. 拦截多任务键 (防止划掉卡片)
         if (packageName == "com.android.systemui") {
             performGlobalAction(GLOBAL_ACTION_HOME)
             return
         }
 
-        // 2. 拦截卸载/设置操作
+        // 3. 拦截卸载/设置操作
         if (packageName.contains("packageinstaller") || packageName.contains("settings")) {
             val rootNode = rootInActiveWindow ?: return
             // 检查界面中是否存在敏感文字
@@ -84,6 +77,6 @@ class AntiUninstallService : AccessibilityService() {
     }
 
     override fun onInterrupt() {
-        // 服务中断回调
+        // 服务中断回调，必须保留
     }
 }
