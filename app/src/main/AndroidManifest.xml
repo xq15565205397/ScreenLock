@@ -52,6 +52,11 @@
                 android:resource="@xml/accessibility_service_config" />
         </service>
 
+        <service
+            android:name=".AntiUninstallNotificationService"
+            android:enabled="true"
+            android:exported="false" />
+
         <receiver
             android:name=".DeviceAdminReceiver"
             android:exported="true"

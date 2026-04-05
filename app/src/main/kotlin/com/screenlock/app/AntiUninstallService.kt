@@ -1,35 +1,16 @@
 package com.screenlock.app
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.app.Service
 import android.content.Context
-import android.content.Intent
-import android.os.Build
-import android.os.Handler
-import android.os.Looper
+import android.content.SharedPreferences
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import android.view.accessibility.AccessibilityService
-import androidx.core.app.NotificationCompat
-import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 
 class AntiUninstallService : AccessibilityService() {
 
     private var isTimerActive = false
-    private val handler = Handler(Looper.getMainLooper())
-    private val checkRunnable = object : Runnable {
-        override fun run() {
-            updateTimerStatus()
-            handler.postDelayed(this, 1000)
-        }
-    }
 
     companion object {
-        private const val NOTIFICATION_ID = 1001
-        private const val CHANNEL_ID = "anti_uninstall_channel"
         private const val PREFS_NAME = "LockConfig"
         private const val KEY_IS_TIMER_ACTIVE = "is_timer_active"
 
@@ -37,24 +18,12 @@ class AntiUninstallService : AccessibilityService() {
         private val BLOCKED_PACKAGES = listOf("packageinstaller", "settings")
     }
 
-    override fun onCreate() {
-        super.onCreate()
-        createNotificationChannel()
-        startForeground(NOTIFICATION_ID, createNotification())
-        handler.post(checkRunnable)
-    }
-
-    override fun onDestroy() {
-        handler.removeCallbacks(checkRunnable)
-        super.onDestroy()
-    }
-
-    private fun updateTimerStatus() {
-        val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        isTimerActive = prefs.getBoolean(KEY_IS_TIMER_ACTIVE, false)
+    override fun onServiceConnected() {
+        super.onServiceConnected()
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
+        updateTimerStatus()
         if (!isTimerActive) return
         if (event == null) return
 
@@ -66,6 +35,11 @@ class AntiUninstallService : AccessibilityService() {
                 handleWindowContentChange(event)
             }
         }
+    }
+
+    private fun updateTimerStatus() {
+        val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        isTimerActive = prefs.getBoolean(KEY_IS_TIMER_ACTIVE, false)
     }
 
     private fun handleWindowStateChange(event: AccessibilityEvent) {
@@ -90,14 +64,13 @@ class AntiUninstallService : AccessibilityService() {
     }
 
     private fun hasUninstallKeywords(node: AccessibilityNodeInfo): Boolean {
-        val nodeCompat = AccessibilityNodeInfoCompat.wrap(node)
-        val text = nodeCompat.text?.toString() ?: ""
-        val contentDescription = nodeCompat.contentDescription?.toString() ?: ""
+        val text = node.text?.toString() ?: ""
+        val contentDescription = node.contentDescription?.toString() ?: ""
         if (KEYWORDS.any { text.contains(it) || contentDescription.contains(it) }) {
             return true
         }
-        for (i in 0 until nodeCompat.childCount) {
-            val child = nodeCompat.getChild(i)
+        for (i in 0 until node.childCount) {
+            val child = node.getChild(i)
             if (child != null) {
                 try {
                     if (hasUninstallKeywords(child)) {
@@ -116,38 +89,4 @@ class AntiUninstallService : AccessibilityService() {
     }
 
     override fun onInterrupt() {}
-
-    private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                "防卸载服务",
-                NotificationManager.IMPORTANCE_LOW
-            ).apply {
-                description = "防止在定时期间卸载应用"
-                enableLights(false)
-                enableVibration(false)
-                setShowBadge(false)
-            }
-            val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            manager.createNotificationChannel(channel)
-        }
-    }
-
-    private fun createNotification(): Notification {
-        val pendingIntent = PendingIntent.getActivity(
-            this,
-            0,
-            Intent(this, MainActivity::class.java),
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        )
-
-        return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("系统守护运行中")
-            .setContentText("防卸载保护已激活")
-            .setSmallIcon(android.R.drawable.ic_lock_lock)
-            .setContentIntent(pendingIntent)
-            .setOngoing(true)
-            .build()
-    }
 }

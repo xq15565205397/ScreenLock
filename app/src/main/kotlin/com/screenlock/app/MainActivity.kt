@@ -147,6 +147,7 @@ class MainActivity : AppCompatActivity() {
             .apply()
 
         LockService.startService(this, selectedMinutes)
+        AntiUninstallNotificationService.startService(this)
     }
 
     private fun stopTimer() {
@@ -158,6 +159,7 @@ class MainActivity : AppCompatActivity() {
             .apply()
 
         LockService.stopService(this)
+        AntiUninstallNotificationService.stopService(this)
 
         resetTimerUI()
     }
