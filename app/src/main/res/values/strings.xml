@@ -10,4 +10,8 @@
     <string name="timer_running">计时中...</string>
     <string name="lock_notification_title">定时锁屏</string>
     <string name="lock_notification_text">屏幕将在 %1$s 后锁定</string>
+    <string name="release_owner">释放设备所有者权限</string>
+    <string name="owner_released">控制权已释放，现在可以卸载了</string>
+    <string name="not_device_owner">当前不是设备所有者</string>
+    <string name="accessibility_service_description">定时锁屏期间防卸载保护</string>
 </resources>

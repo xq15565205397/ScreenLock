@@ -55,4 +55,11 @@
         android:layout_marginTop="24dp"
         android:visibility="gone" />
 
+    <Button
+        android:id="@+id/releaseOwnerButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/release_owner"
+        android:layout_marginTop="16dp" />
+
 </LinearLayout>
