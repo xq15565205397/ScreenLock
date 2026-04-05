@@ -6,6 +6,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.provider.Settings
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.screenlock.app.databinding.ActivityMainBinding
 
@@ -18,9 +21,12 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var devicePolicyManager: DevicePolicyManager
     private lateinit var componentName: ComponentName
+    private lateinit var sharedPreferences: android.content.SharedPreferences
 
     companion object {
         private const val REQUEST_CODE_ENABLE_ADMIN = 1001
+        private const val PREFS_NAME = "LockConfig"
+        private const val KEY_IS_TIMER_ACTIVE = "is_timer_active"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,10 +36,12 @@ class MainActivity : AppCompatActivity() {
 
         devicePolicyManager = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
         componentName = ComponentName(this, DeviceAdminReceiver::class.java)
+        sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
         setupNumberPicker()
         setupButtons()
         checkAdminPermission()
+        checkAccessibilityService()
     }
 
     private fun setupNumberPicker() {
@@ -50,7 +58,7 @@ class MainActivity : AppCompatActivity() {
             if (isTimerRunning) {
                 stopTimer()
             } else {
-                if (checkAdminPermission()) {
+                if (checkAdminPermission() && checkAccessibilityService()) {
                     startTimer()
                 }
             }
@@ -58,6 +66,10 @@ class MainActivity : AppCompatActivity() {
 
         binding.grantPermissionButton.setOnClickListener {
             requestAdminPermission()
+        }
+
+        binding.releaseOwnerButton.setOnClickListener {
+            releaseDeviceOwner()
         }
     }
 
@@ -69,6 +81,30 @@ class MainActivity : AppCompatActivity() {
             android.view.View.VISIBLE
         }
         return isActive
+    }
+
+    private fun checkAccessibilityService(): Boolean {
+        val enabledServices = Settings.Secure.getString(
+            contentResolver,
+            Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+        )
+        val isEnabled = enabledServices?.contains(packageName) == true
+        if (!isEnabled) {
+            showAccessibilityDialog()
+        }
+        return isEnabled
+    }
+
+    private fun showAccessibilityDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("启用无障碍服务")
+            .setMessage("为了防止在定时期间卸载应用，请先在系统设置中启用无障碍服务。")
+            .setPositiveButton("去设置") { _, _ ->
+                val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+                startActivity(intent)
+            }
+            .setNegativeButton("取消", null)
+            .show()
     }
 
     private fun requestAdminPermission() {
@@ -106,12 +142,20 @@ class MainActivity : AppCompatActivity() {
         binding.toggleButton.text = getString(R.string.stop_timer)
         binding.minutePicker.isEnabled = false
 
+        sharedPreferences.edit()
+            .putBoolean(KEY_IS_TIMER_ACTIVE, true)
+            .apply()
+
         LockService.startService(this, selectedMinutes)
     }
 
     private fun stopTimer() {
         timer?.cancel()
         timer = null
+
+        sharedPreferences.edit()
+            .putBoolean(KEY_IS_TIMER_ACTIVE, false)
+            .apply()
 
         LockService.stopService(this)
 
@@ -123,5 +167,19 @@ class MainActivity : AppCompatActivity() {
         binding.toggleButton.text = getString(R.string.start_timer)
         binding.remainingTimeText.text = "--:--"
         binding.minutePicker.isEnabled = true
+
+        sharedPreferences.edit()
+            .putBoolean(KEY_IS_TIMER_ACTIVE, false)
+            .apply()
+    }
+
+    private fun releaseDeviceOwner() {
+        if (devicePolicyManager.isDeviceOwnerApp(packageName)) {
+            stopTimer()
+            devicePolicyManager.clearDeviceOwnerApp(packageName)
+            Toast.makeText(this, R.string.owner_released, Toast.LENGTH_LONG).show()
+        } else {
+            Toast.makeText(this, R.string.not_device_owner, Toast.LENGTH_SHORT).show()
+        }
     }
 }
