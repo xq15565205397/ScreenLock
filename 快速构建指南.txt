@@ -10,7 +10,7 @@
    - 访问 https://developer.android.com/studio
    - 下载并安装 Windows 版本
    - 或使用命令：winget install Google.AndroidStudio
-
+34567
 2. 打开项目
    - 启动 Android Studio
    - 选择 "Open an Existing Project"
