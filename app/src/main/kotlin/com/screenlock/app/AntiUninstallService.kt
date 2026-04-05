@@ -15,9 +15,13 @@ import androidx.core.app.NotificationCompat
  */
 class AntiUninstallService : AccessibilityService() {
 
+    // ... 保持 import 不变
+
+class AntiUninstallService : AccessibilityService() {
+
     override fun onCreate() {
         super.onCreate()
-        // 启动前台服务以提高 vivo 系统的存活率
+        // 修正：启动前台服务，使用更通用的系统图标 android.R.drawable.ic_secure
         startForeground(1, createNotification())
     }
 
@@ -31,9 +35,14 @@ class AntiUninstallService : AccessibilityService() {
         return NotificationCompat.Builder(this, channelId)
             .setContentTitle("系统守护运行中")
             .setContentText("正在保护定时锁定状态...")
-            .setSmallIcon(android.R.drawable.ic_lock_idle_lock)
+            // 修正：换用绝对存在的图标
+            .setSmallIcon(android.R.drawable.ic_secure)
+            .setOngoing(true)
             .build()
     }
+    
+    // ... 其余逻辑保持不变
+}
 
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
         // 读取定时器状态
