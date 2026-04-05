@@ -1,7 +1,6 @@
-
-&lt;?xml version="1.0" encoding="utf-8"?&gt;
-&lt;data-extraction-rules&gt;
-    &lt;cloud-backup&gt;
-        &lt;exclude domain="sharedpref" path="device_policy.xml"/&gt;
-    &lt;/cloud-backup&gt;
-&lt;/data-extraction-rules&gt;
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="sharedpref" path="device_policy.xml"/>
+    </cloud-backup>
+</data-extraction-rules>

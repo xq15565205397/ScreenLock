@@ -1,13 +1,13 @@
-
-&lt;resources&gt;
-    &lt;string name="app_name"&gt;定时锁屏&lt;/string&gt;
-    &lt;string name="start_timer"&gt;开始计时&lt;/string&gt;
-    &lt;string name="stop_timer"&gt;停止计时&lt;/string&gt;
-    &lt;string name="minutes"&gt;分钟&lt;/string&gt;
-    &lt;string name="remaining_time"&gt;剩余时间&lt;/string&gt;
-    &lt;string name="please_grant_admin"&gt;请先授予设备管理器权限&lt;/string&gt;
-    &lt;string name="grant_permission"&gt;授予权限&lt;/string&gt;
-    &lt;string name="timer_running"&gt;计时中...&lt;/string&gt;
-    &lt;string name="lock_notification_title"&gt;定时锁屏&lt;/string&gt;
-    &lt;string name="lock_notification_text"&gt;屏幕将在 %1$s 后锁定&lt;/string&gt;
-&lt;/resources&gt;
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">定时锁屏</string>
+    <string name="start_timer">开始计时</string>
+    <string name="stop_timer">停止计时</string>
+    <string name="minutes">分钟</string>
+    <string name="remaining_time">剩余时间</string>
+    <string name="please_grant_admin">请先授予设备管理器权限</string>
+    <string name="grant_permission">授予权限</string>
+    <string name="timer_running">计时中...</string>
+    <string name="lock_notification_title">定时锁屏</string>
+    <string name="lock_notification_text">屏幕将在 %1$s 后锁定</string>
+</resources>

@@ -1,14 +1,9 @@
-
 package com.screenlock.app
 
-import android.app.Activity
-import android.app.AlarmManager
-import android.app.PendingIntent
 import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import androidx.appcompat.app.AppCompatActivity
@@ -45,7 +40,7 @@ class MainActivity : AppCompatActivity() {
         binding.minutePicker.minValue = 1
         binding.minutePicker.maxValue = 180
         binding.minutePicker.value = selectedMinutes
-        binding.minutePicker.setOnValueChangedListener { _, _, newVal -&gt;
+        binding.minutePicker.setOnValueChangedListener { _, _, newVal ->
             selectedMinutes = newVal
         }
     }
@@ -69,11 +64,9 @@ class MainActivity : AppCompatActivity() {
     private fun checkAdminPermission(): Boolean {
         val isActive = devicePolicyManager.isAdminActive(componentName)
         binding.grantPermissionButton.visibility = if (isActive) {
-            binding.grantPermissionButton.visibility = android.view.View.GONE
-            true
+            android.view.View.GONE
         } else {
-            binding.grantPermissionButton.visibility = android.view.View.VISIBLE
-            false
+            android.view.View.VISIBLE
         }
         return isActive
     }
@@ -86,6 +79,7 @@ class MainActivity : AppCompatActivity() {
         startActivityForResult(intent, REQUEST_CODE_ENABLE_ADMIN)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_ENABLE_ADMIN) {
@@ -95,14 +89,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun startTimer() {
         val milliseconds = selectedMinutes * 60 * 1000L
-        
+
         timer = object : CountDownTimer(milliseconds, 1000) {
             override fun onTick(millisUntilFinished: Long) {
-                updateRemainingTime(millisUntilFinished)
+                val minutes = (millisUntilFinished / 1000) / 60
+                val seconds = (millisUntilFinished / 1000) % 60
+                binding.remainingTimeText.text = String.format("%02d:%02d", minutes, seconds)
             }
 
             override fun onFinish() {
-                lockScreen()
                 resetTimerUI()
             }
         }.start()
@@ -110,11 +105,16 @@ class MainActivity : AppCompatActivity() {
         isTimerRunning = true
         binding.toggleButton.text = getString(R.string.stop_timer)
         binding.minutePicker.isEnabled = false
+
+        LockService.startService(this, selectedMinutes)
     }
 
     private fun stopTimer() {
         timer?.cancel()
         timer = null
+
+        LockService.stopService(this)
+
         resetTimerUI()
     }
 
@@ -123,17 +123,5 @@ class MainActivity : AppCompatActivity() {
         binding.toggleButton.text = getString(R.string.start_timer)
         binding.remainingTimeText.text = "--:--"
         binding.minutePicker.isEnabled = true
-    }
-
-    private fun updateRemainingTime(millisUntilFinished: Long) {
-        val minutes = (millisUntilFinished / 1000) / 60
-        val seconds = (millisUntilFinished / 1000) % 60
-        binding.remainingTimeText.text = String.format("%02d:%02d", minutes, seconds)
-    }
-
-    private fun lockScreen() {
-        if (devicePolicyManager.isAdminActive(componentName)) {
-            devicePolicyManager.lockNow()
-        }
     }
 }

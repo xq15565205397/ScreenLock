@@ -1,4 +1,3 @@
-
 package com.screenlock.app
 
 import android.app.admin.DeviceAdminReceiver

@@ -1,16 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
-&lt;?xml version="1.0" encoding="utf-8"?&gt;
-&lt;manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"&gt;
+    <uses-permission android:name="android.permission.USES_POLICY_FORCE_LOCK" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
-    &lt;uses-permission android:name="android.permission.USES_POLICY_FORCE_LOCK" /&gt;
-    &lt;uses-permission android:name="android.permission.WAKE_LOCK" /&gt;
-    &lt;uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /&gt;
-    &lt;uses-permission android:name="android.permission.FOREGROUND_SERVICE" /&gt;
-    &lt;uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" /&gt;
-    &lt;uses-permission android:name="android.permission.POST_NOTIFICATIONS" /&gt;
-
-    &lt;application
+    <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -19,41 +18,47 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ScreenLock"
-        tools:targetApi="31"&gt;
-        
-        &lt;activity
-            android:name=".MainActivity"
-            android:exported="true"&gt;
-            &lt;intent-filter&gt;
-                &lt;action android:name="android.intent.action.MAIN" /&gt;
-                &lt;category android:name="android.intent.category.LAUNCHER" /&gt;
-            &lt;/intent-filter&gt;
-        &lt;/activity&gt;
+        tools:targetApi="31">
 
-        &lt;service
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <service
             android:name=".LockService"
             android:enabled="true"
-            android:exported="false" /&gt;
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="lockedTimer" />
+        </service>
 
-        &lt;receiver
+        <receiver
             android:name=".DeviceAdminReceiver"
-            android:permission="android.permission.BIND_DEVICE_ADMIN"&gt;
-            &lt;meta-data
+            android:exported="true"
+            android:permission="android.permission.BIND_DEVICE_ADMIN">
+            <meta-data
                 android:name="android.app.device_admin"
-                android:resource="@xml/device_admin_receiver" /&gt;
-            &lt;intent-filter&gt;
-                &lt;action android:name="android.app.action.DEVICE_ADMIN_ENABLED" /&gt;
-            &lt;/intent-filter&gt;
-        &lt;/receiver&gt;
+                android:resource="@xml/device_admin_receiver" />
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+            </intent-filter>
+        </receiver>
 
-        &lt;receiver
+        <receiver
             android:name=".BootReceiver"
             android:enabled="true"
-            android:exported="true"&gt;
-            &lt;intent-filter&gt;
-                &lt;action android:name="android.intent.action.BOOT_COMPLETED" /&gt;
-            &lt;/intent-filter&gt;
-        &lt;/receiver&gt;
-    &lt;/application&gt;
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+    </application>
 
-&lt;/manifest&gt;
+</manifest>

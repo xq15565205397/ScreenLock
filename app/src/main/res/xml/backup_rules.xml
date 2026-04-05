@@ -1,5 +1,4 @@
-
-&lt;?xml version="1.0" encoding="utf-8"?&gt;
-&lt;full-backup-content&gt;
-    &lt;exclude domain="sharedpref" path="device_policy.xml"/&gt;
-&lt;/full-backup-content&gt;
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <exclude domain="sharedpref" path="device_policy.xml"/>
+</full-backup-content>
